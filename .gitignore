@@ -1,0 +1,6 @@
+Debug/
+.vs/
+
+*.log
+*.user
+*.suo

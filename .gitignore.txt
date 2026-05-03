@@ -1,0 +1,6 @@
+Debug/
+
+
+*.log
+*.user
+*.suo
