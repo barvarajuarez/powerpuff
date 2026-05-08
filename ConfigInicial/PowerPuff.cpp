@@ -158,10 +158,12 @@ int main()
     Shader lightingShader("Shader/lighting.vs", "Shader/lighting.frag");
     Shader lampShader("Shader/lamp.vs", "Shader/lamp.frag");
 
-    Model Piso((char*)"Models/piso.obj"); 
-   // Model Pared1((char*)"Models/pared1.obj");
-    //Model Par((char*)"Models/par.obj");
-
+    Model Piso((char*)"Models/piso.obj");
+    Model bus((char*)"Models/pared1.obj");
+    Model Pared((char*)"Models/pared1.obj");
+    Model Pared2((char*)"Models/pared2.obj");
+    Model Pared3((char*)"Models/pared3.obj");
+    Model Pared4((char*)"Models/pared4.obj");
 
     // First, set the container's VAO (and VBO)
     GLuint VBO, VAO;
@@ -318,21 +320,62 @@ int main()
         glm::mat4 model(1);
 
 
-
         //Carga de modelo
         model = glm::mat4(1);
-        model = glm::translate(model, glm::vec3(0.0f, -0.01f, 0.0f));
+        model = glm::translate(model, glm::vec3(0.0f, 0.380f, 1.24f));///AQUIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
         model = glm::scale(model, glm::vec3(2.5f, 1.0f, 2.5f));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(glGetUniformLocation(lightingShader.Program, "material.diffuse"), 0);
+        glActiveTexture(GL_TEXTURE0);
         Piso.Draw(lightingShader);
 
-        //Carga el modelo de las paredes
-        //model = glm::mat4(1.0f);
-        //model = glm::translate(model, glm::vec3(-4.0f, 1.5f, 0.0f));
-        //model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        //model = glm::scale(model, glm::vec3(2.5f, 1.0f, 2.5f));
-        //glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-        //Pared1.Draw(lightingShader);
+
+        // Carga el modelo de las paredes
+        //pared1 YA ESTAAAAAAA LISTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(-7.20f, 3.12f, 1.24f));
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(2.5f, 2.5f, 2.5f));
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(glGetUniformLocation(lightingShader.Program, "material.diffuse"), 0);
+        glActiveTexture(GL_TEXTURE0);
+        Pared.Draw(lightingShader);
+
+
+        //pared2
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(5.29f, 3.12f, 1.24f));
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(2.5f, 2.5f, 2.5f));
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(glGetUniformLocation(lightingShader.Program, "material.diffuse"), 0);
+        glActiveTexture(GL_TEXTURE0);
+        Pared2.Draw(lightingShader);
+
+
+        //pared3 YA ESTAAAAAAA LISTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, 3.12f, 6.525f));
+        model = glm::rotate(model, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(2.5f, 2.5f, 2.5f));
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(glGetUniformLocation(lightingShader.Program, "material.diffuse"), 0);
+        glActiveTexture(GL_TEXTURE0);
+        Pared3.Draw(lightingShader);
+
+
+        //pared4 YA ESTAAAAAAA LISTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, 3.12f, -5.97f));
+        model = glm::rotate(model, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(2.5f, 2.5f, 2.5f));
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(glGetUniformLocation(lightingShader.Program, "material.diffuse"), 0);
+        glActiveTexture(GL_TEXTURE0);
+        Pared4.Draw(lightingShader);
+
+
+
 
         // Activar unidad de textura 0 para todos los cubos
         glActiveTexture(GL_TEXTURE0);
@@ -371,7 +414,7 @@ int main()
         }
 
         //*********************
-        //Corazon del respaldo* 
+        //Coraz n del respaldo* 
         //*********************
 
         glBindTexture(GL_TEXTURE_2D, texRosaTapete);
@@ -475,6 +518,7 @@ int main()
         //Buros*
         //******
 
+
         float posicionesX[] = { -2.8f, 2.8f };
 
         for (int i = 0; i < 2; i++) {
@@ -487,34 +531,28 @@ int main()
             glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
             glDrawArrays(GL_TRIANGLES, 0, 36);
 
-            //Dos cajones
+            // Dos cajones
             glBindTexture(GL_TEXTURE_2D, texGris);
 
             float alturas[2] = { 0.7f, 0.3f };
 
             for (int j = 0; j < 2; j++) {
 
-                //Parte de enfrente del cajon
+                // Parte de enfrente del caj n
                 model = glm::mat4(1);
-                model = glm::translate(model, glm::vec3(posicionesX[i], alturas[j], -3.68f)); 
+                model = glm::translate(model, glm::vec3(posicionesX[i], alturas[j], -3.68f)); // un poco al frente
                 model = glm::scale(model, glm::vec3(0.6f, 0.3f, 0.06f));
                 glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
                 glDrawArrays(GL_TRIANGLES, 0, 36);
 
                 //Manija de los cajones
                 model = glm::mat4(1);
-                model = glm::translate(model, glm::vec3(posicionesX[i], alturas[j], -3.62f));
+                model = glm::translate(model, glm::vec3(posicionesX[i], alturas[j], -3.62f)); // sobresale m s
                 model = glm::scale(model, glm::vec3(0.15f, 0.05f, 0.05f));
                 glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
                 glDrawArrays(GL_TRIANGLES, 0, 36);
             }
 
-            //Base piso
-            model = glm::mat4(1);
-            model = glm::translate(model, glm::vec3(posicionesX[i], 0.0f, -4.0f));
-            model = glm::scale(model, glm::vec3(0.7f, 0.1f, 0.5f));
-            glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-            glDrawArrays(GL_TRIANGLES, 0, 36);
         }
 
         //******************
@@ -788,7 +826,7 @@ int main()
 
 
 //***************************************************
-//Funcion para cargar textura con ayuda de stb_image*
+//Funci n para cargar textura con ayuda de stb_image*
 //***************************************************
 
 GLuint cargarTextura(const char* path)
@@ -817,6 +855,7 @@ GLuint cargarTextura(const char* path)
     stbi_image_free(data);
     return texID;
 }
+
 
 // Moves/alters the camera positions based on user input
 void DoMovement()

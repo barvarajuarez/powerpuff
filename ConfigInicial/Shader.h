@@ -14,7 +14,7 @@ public:
 	GLuint Program;
 	GLuint uniformColor;
 	// Constructor generates the shader on the fly
-	Shader(const GLchar *vertexPath, const GLchar *fragmentPath)
+	Shader(const GLchar* vertexPath, const GLchar* fragmentPath)
 	{
 		// 1. Retrieve the vertex/fragment source code from filePath
 		std::string vertexCode;
@@ -44,8 +44,8 @@ public:
 		{
 			std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
 		}
-		const GLchar *vShaderCode = vertexCode.c_str();
-		const GLchar *fShaderCode = fragmentCode.c_str();
+		const GLchar* vShaderCode = vertexCode.c_str();
+		const GLchar* fShaderCode = fragmentCode.c_str();
 		// 2. Compile shaders
 		GLuint vertex, fragment;
 		GLint success;

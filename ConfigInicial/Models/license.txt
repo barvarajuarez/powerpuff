@@ -1,0 +1,11 @@
+Model Information:
+* title:	PowerPuff Girls Phone
+* source:	https://sketchfab.com/3d-models/powerpuff-girls-phone-17023c5ae5184729a6b6874fb7bb3fcd
+* author:	ZZBIGGY (https://sketchfab.com/ZZBIGGY)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "PowerPuff Girls Phone" (https://sketchfab.com/3d-models/powerpuff-girls-phone-17023c5ae5184729a6b6874fb7bb3fcd) by ZZBIGGY (https://sketchfab.com/ZZBIGGY) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

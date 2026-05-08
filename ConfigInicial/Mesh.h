@@ -13,8 +13,6 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-
-
 #include "Shader.h"
 
 using namespace std;
@@ -66,7 +64,8 @@ public:
 		for (GLuint i = 0; i < this->textures.size(); i++)
 		{
 			glActiveTexture(GL_TEXTURE0 + i); // Active proper texture unit before binding
-											  // Retrieve texture number (the N in diffuse_textureN)
+			// Retrieve texture number (the N in diffuse_textureN)
+
 			stringstream ss;
 			string number;
 			string name = this->textures[i].type;
@@ -74,15 +73,15 @@ public:
 			if (name == "texture_diffuse")
 			{
 				ss << diffuseNr++; // Transfer GLuint to stream
+				//Mandamos la textura al uniform correcto del shader
+				glUniform1i(glGetUniformLocation(shader.Program, "material.diffuse"), i);
 			}
 			else if (name == "texture_specular")
 			{
 				ss << specularNr++; // Transfer GLuint to stream
+				glUniform1i(glGetUniformLocation(shader.Program, "material.specular"), i);
 			}
 
-			number = ss.str();
-			// Now set the sampler to the correct texture unit
-			glUniform1i(glGetUniformLocation(shader.Program, (name + number).c_str()), i);
 			// And finally bind the texture
 			glBindTexture(GL_TEXTURE_2D, this->textures[i].id);
 		}
@@ -96,11 +95,13 @@ public:
 		glBindVertexArray(0);
 
 		// Always good practice to set everything back to defaults once configured.
-		for (GLuint i = 0; i < this->textures.size(); i++)
-		{
-			glActiveTexture(GL_TEXTURE0 + i);
-			glBindTexture(GL_TEXTURE_2D, 0);
-		}
+		//for (GLuint i = 0; i < this->textures.size(); i++)
+		//{
+		//	glActiveTexture(GL_TEXTURE0 + i);
+		//	glBindTexture(GL_TEXTURE_2D, 0);
+		//}
+
+		// Se elimino el loop que limpiaba las texturas porque eso causaba que no se vieran las texturas de todos 
 	}
 
 private:
@@ -130,13 +131,13 @@ private:
 		// Set the vertex attribute pointers
 		// Vertex Positions
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)0);
 		// Vertex Normals
 		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, Normal));
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, Normal));
 		// Vertex Texture Coords
 		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, TexCoords));
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, TexCoords));
 
 		glBindVertexArray(0);
 	}

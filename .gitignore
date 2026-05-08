@@ -4,3 +4,10 @@ Debug/
 *.log
 *.user
 *.suo
+
+
+*.pdb
+*.obj
+*.ipdb
+*.iobj
+*.exe
