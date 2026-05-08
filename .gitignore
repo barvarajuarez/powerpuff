@@ -11,3 +11,4 @@ Debug/
 *.ipdb
 *.iobj
 *.exe
+*.tlog

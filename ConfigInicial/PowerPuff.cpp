@@ -27,6 +27,7 @@
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void MouseCallback(GLFWwindow* window, double xPos, double yPos);
 void DoMovement();
+void Animation();
 GLuint cargarTextura(const char* path); //Convierte archivo de imagen en textura de OpenGL
 
 // Window dimensions
@@ -42,6 +43,17 @@ bool firstMouse = true;
 // Light attributes
 glm::vec3 lightPos(0.0f, 0.0f, 0.0f);
 bool active;
+
+float rotTapa = -115.0f;
+bool AnimBaul = false;
+
+float libroY = 3.75f;
+float libroRot = 15.0f;
+bool AnimLibro = false;
+
+float sillaZ = 0.0f;
+bool AnimSilla = false;
+bool SillaJalada = false;
 
 // Positions of the point lights
 glm::vec3 pointLightPositions[] = {
@@ -164,6 +176,8 @@ int main()
     Model Pared2((char*)"Models/pared2.obj");
     Model Pared3((char*)"Models/pared3.obj");
     Model Pared4((char*)"Models/pared4.obj");
+    Model Crayolas((char*)"Models/crayolas.obj");
+    Model Tele((char*)"Models/telefo.obj");
 
     // First, set the container's VAO (and VBO)
     GLuint VBO, VAO;
@@ -219,6 +233,7 @@ int main()
         // Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
         glfwPollEvents();
         DoMovement();
+        Animation();
 
         // Clear the colorbuffer
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -374,8 +389,22 @@ int main()
         glActiveTexture(GL_TEXTURE0);
         Pared4.Draw(lightingShader);
 
+        //crayolas y hoja
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(-2.5f, 0.60f, 0.9f));
+        model = glm::scale(model, glm::vec3(3.0f, 3.0f, 3.0f));
+        model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        glUniform1i(glGetUniformLocation(lightingShader.Program, "material.diffuse"), 0);
+        glActiveTexture(GL_TEXTURE0);
+        Crayolas.Draw(lightingShader);
 
-
+        //telefono
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(2.8f, 1.02f, -4.0f));
+        model = glm::scale(model, glm::vec3(2.5f, 2.5f, 2.5f));
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        Tele.Draw(lightingShader);
 
         // Activar unidad de textura 0 para todos los cubos
         glActiveTexture(GL_TEXTURE0);
@@ -494,7 +523,7 @@ int main()
         glBindTexture(GL_TEXTURE_2D, texVerde);
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(-1.2f, 0.55f, -2.0f));
-        model = glm::scale(model, glm::vec3(1.4f, 0.12f, 5.0f)); // m s larga en Z
+        model = glm::scale(model, glm::vec3(1.4f, 0.12f, 5.0f));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
@@ -540,14 +569,14 @@ int main()
 
                 // Parte de enfrente del caj n
                 model = glm::mat4(1);
-                model = glm::translate(model, glm::vec3(posicionesX[i], alturas[j], -3.68f)); // un poco al frente
+                model = glm::translate(model, glm::vec3(posicionesX[i], alturas[j], -3.68f));
                 model = glm::scale(model, glm::vec3(0.6f, 0.3f, 0.06f));
                 glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
                 glDrawArrays(GL_TRIANGLES, 0, 36);
 
                 //Manija de los cajones
                 model = glm::mat4(1);
-                model = glm::translate(model, glm::vec3(posicionesX[i], alturas[j], -3.62f)); // sobresale m s
+                model = glm::translate(model, glm::vec3(posicionesX[i], alturas[j], -3.62f));
                 model = glm::scale(model, glm::vec3(0.15f, 0.05f, 0.05f));
                 glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
                 glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -596,11 +625,20 @@ int main()
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
-        // Libro 1: Azul claro (inclinado izquierda)
+        /*  Libro 1: Azul claro (inclinado izquierda)
+         glBindTexture(GL_TEXTURE_2D, texAzulLibro);
+         model = glm::mat4(1.0f);
+         model = glm::translate(model, glm::vec3(-4.1f, 3.75f, -4.75f));
+         model = glm::rotate(model, glm::radians(15.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+         model = glm::scale(model, glm::vec3(0.18f, 0.6f, 0.35f));
+         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+         glDrawArrays(GL_TRIANGLES, 0, 36);*/
+
+         // Libro 1: Azul claro (es el que se cae)
         glBindTexture(GL_TEXTURE_2D, texAzulLibro);
         model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(-4.1f, 3.75f, -4.75f));
-        model = glm::rotate(model, glm::radians(15.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+        model = glm::translate(model, glm::vec3(-4.1f, libroY, -4.75f));
+        model = glm::rotate(model, glm::radians(libroRot), glm::vec3(0.0f, 0.0f, 1.0f));
         model = glm::scale(model, glm::vec3(0.18f, 0.6f, 0.35f));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -653,16 +691,18 @@ int main()
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         // Tapa 
+
         glBindTexture(GL_TEXTURE_2D, texMorado);
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(4.3f, 0.4f, -2.5f));
         model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         model = glm::translate(model, glm::vec3(0.0f, 0.4f, 0.6f));
-        model = glm::rotate(model, glm::radians(-115.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        model = glm::translate(model, glm::vec3(0.0f, 0.4f, 0.0f));
-        model = glm::scale(model, glm::vec3(2.2f, 0.8f, 0.15f));
+        model = glm::rotate(model, glm::radians(rotTapa), glm::vec3(1.0f, 0.0f, 0.0f));
+        model = glm::translate(model, glm::vec3(0.0f, 0.6f, 0.0f));
+        model = glm::scale(model, glm::vec3(2.2f, 1.2f, 0.1f));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         glDrawArrays(GL_TRIANGLES, 0, 36);
+
 
         // Tapa por dentro
         glBindTexture(GL_TEXTURE_2D, texCrema);
@@ -670,9 +710,9 @@ int main()
         model = glm::translate(model, glm::vec3(4.3f, 0.4f, -2.5f));
         model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         model = glm::translate(model, glm::vec3(0.0f, 0.4f, 0.6f));
-        model = glm::rotate(model, glm::radians(-115.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        model = glm::translate(model, glm::vec3(0.0f, 0.38f, 0.08f));
-        model = glm::scale(model, glm::vec3(2.0f, 0.7f, 0.05f));
+        model = glm::rotate(model, glm::radians(rotTapa), glm::vec3(1.0f, 0.0f, 0.0f));
+        model = glm::translate(model, glm::vec3(0.0f, 0.58f, 0.08f));
+        model = glm::scale(model, glm::vec3(2.0f, 1.0f, 0.05f));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
@@ -707,7 +747,7 @@ int main()
         glBindTexture(GL_TEXTURE_2D, texRosaSilla);
         glm::vec3 posSillas[] = {
             centroMesa + glm::vec3(-1.2f, 0.0f,  0.0f),
-            centroMesa + glm::vec3(0.0f, 0.0f, -1.2f),
+            centroMesa + glm::vec3(0.0f, 0.0f, -1.2f - sillaZ),
             centroMesa + glm::vec3(1.2f, 0.0f,  0.0f)
         };
         float angSillas[] = { -90.0f, 180.0f, 90.0f };
@@ -950,8 +990,63 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
             Light1 = glm::vec3(0);//Cuado es solo un valor en los 3 vectores pueden dejar solo una componente
         }
     }
+
+    if (keys[GLFW_KEY_N]) {
+        AnimBaul = !AnimBaul;
+    }
+
+    if (key == GLFW_KEY_M && action == GLFW_PRESS) {
+        AnimLibro = true;
+    }
+
+    if (key == GLFW_KEY_B && action == GLFW_PRESS) {
+        if (!AnimSilla)
+            AnimSilla = true;
+    }
 }
 
+void Animation() {
+    if (AnimBaul) {
+        if (rotTapa > -90.0f)
+            rotTapa -= 0.6f;
+        else
+            AnimBaul = false;
+    }
+    else {
+        if (rotTapa < 0.0f)
+            rotTapa += 0.6f;
+    }
+    if (AnimLibro) {
+        if (libroY > 0.0f) {
+            libroY -= 0.05f;
+            libroRot += 1.5f;
+        }
+        else {
+            libroY = 0.0f;
+            libroRot = 90.0f;
+            AnimLibro = false;
+        }
+    }
+    if (AnimSilla) {
+        if (!SillaJalada) {
+            if (sillaZ < 1.5f)
+                sillaZ += 0.03f;
+            else {
+                SillaJalada = true;
+                AnimSilla = false;
+            }
+        }
+        else {
+            if (sillaZ > 0.0f)
+                sillaZ -= 0.03f;
+            else {
+                SillaJalada = false;
+                AnimSilla = false;
+            }
+        }
+    }
+
+}
 void MouseCallback(GLFWwindow* window, double xPos, double yPos)
 {
     if (firstMouse)
