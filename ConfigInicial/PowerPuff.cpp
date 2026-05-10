@@ -55,6 +55,15 @@ float sillaZ = 0.0f;
 bool AnimSilla = false;
 bool SillaJalada = false;
 
+//AGREGADO 09/05
+bool AnimTele = false;
+float teleX = 0.0f;
+float dirTele = 0.05f;
+float teleRot = 0.0f;
+float dirRot = 1.5f;
+
+bool LuzLampara = false;
+
 // Positions of the point lights
 glm::vec3 pointLightPositions[] = {
     glm::vec3(0.0f, 0.0f,  0.0f),
@@ -177,7 +186,12 @@ int main()
     Model Pared3((char*)"Models/pared3.obj");
     Model Pared4((char*)"Models/pared4.obj");
     Model Crayolas((char*)"Models/crayolas.obj");
-    Model Tele((char*)"Models/telefo.obj");
+
+    //AGREGADO 09/05
+    Model TeleBase((char*)"Models/base.obj");
+    Model TeleCable((char*)"Models/cable.obj");
+    Model TeleCabeza((char*)"Models/cabecita.obj");
+    Model Lampara((char*)"Models/lampp.obj");
 
     // First, set the container's VAO (and VBO)
     GLuint VBO, VAO;
@@ -277,14 +291,25 @@ int main()
         glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].linear"), 0.045f);
         glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].quadratic"), 0.075f);
 
-        // Point light 2
-        glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].position"), pointLightPositions[1].x, pointLightPositions[1].y, pointLightPositions[1].z);
-        glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].ambient"), 0.05f, 0.05f, 0.05f);
-        glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].diffuse"), 0.0f, 0.0f, 0.0f);
-        glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].specular"), 0.0f, 0.0f, 0.0f);
-        glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].constant"), 1.0f);
-        glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].linear"), 0.0f);
-        glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].quadratic"), 0.0f);
+        // Point light 2 - LAMPARA
+        if (LuzLampara) {
+            glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].position"), -3.1f, 2.0f, -2.0f);
+            glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].ambient"), 0.4f, 0.4f, 0.4f);
+            glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].diffuse"), 0.2f, 0.2f, 0.15f);
+            glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].specular"), 0.5f, 0.5f, 0.3f);
+            glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].constant"), 1.0f);
+            glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].linear"), 0.22f);
+            glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].quadratic"), 0.20f);
+        }
+        else {
+            glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].position"), pointLightPositions[1].x, pointLightPositions[1].y, pointLightPositions[1].z);
+            glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].ambient"), 0.0f, 0.0f, 0.0f);
+            glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].diffuse"), 0.0f, 0.0f, 0.0f);
+            glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[1].specular"), 0.0f, 0.0f, 0.0f);
+            glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].constant"), 1.0f);
+            glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].linear"), 0.0f);
+            glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[1].quadratic"), 0.0f);
+        }
 
         // Point light 3
         glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].position"), pointLightPositions[2].x, pointLightPositions[2].y, pointLightPositions[2].z);
@@ -399,12 +424,36 @@ int main()
         glActiveTexture(GL_TEXTURE0);
         Crayolas.Draw(lightingShader);
 
-        //telefono
+        //AGREGADO  09/05
+        //TELEFONO
+        // BASE - estatica
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(2.8f, 1.02f, -4.0f));
         model = glm::scale(model, glm::vec3(2.5f, 2.5f, 2.5f));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-        Tele.Draw(lightingShader);
+        TeleBase.Draw(lightingShader);
+
+        // CABLE - vibra en X
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(2.75f + teleX, 1.02f, -4.0f));
+        model = glm::scale(model, glm::vec3(2.5f, 2.5f, 2.5f));
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        TeleCable.Draw(lightingShader);
+
+        // CABEZA - vibra en X y rota
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(2.8f + teleX, 1.02f, -4.0f));
+        model = glm::rotate(model, glm::radians(teleRot), glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(2.5f, 2.5f, 2.5f));
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        TeleCabeza.Draw(lightingShader);
+
+        //LAMPARA
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(-3.1f, 0.65f, -4.0f));
+        model = glm::scale(model, glm::vec3(1.3f, 1.3f, 1.3f));
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        Lampara.Draw(lightingShader);
 
         // Activar unidad de textura 0 para todos los cubos
         glActiveTexture(GL_TEXTURE0);
@@ -479,6 +528,7 @@ int main()
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
 
+        //CAMBIOS 09/05
         //**********
         //Almohadas*
         //**********
@@ -486,21 +536,21 @@ int main()
         // Almohada izquierda
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(-1.1f, 0.65f, -3.8f));
-        model = glm::scale(model, glm::vec3(1.1f, 0.2f, 0.5f));
+        model = glm::scale(model, glm::vec3(1.0f, 0.2f, 0.7f));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         // Almohada del centro
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, 0.65f, -3.8f));
-        model = glm::scale(model, glm::vec3(1.1f, 0.2f, 0.5f));
+        model = glm::scale(model, glm::vec3(1.0f, 0.2f, 0.7f));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         // Almohada derecha
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(1.1f, 0.65f, -3.8f));
-        model = glm::scale(model, glm::vec3(1.1f, 0.2f, 0.5f));
+        model = glm::scale(model, glm::vec3(1.0f, 0.2f, 0.7F));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
@@ -522,26 +572,28 @@ int main()
         // Cobija verde
         glBindTexture(GL_TEXTURE_2D, texVerde);
         model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(-1.2f, 0.55f, -2.0f));
-        model = glm::scale(model, glm::vec3(1.4f, 0.12f, 5.0f));
+        model = glm::translate(model, glm::vec3(-1.2f, 0.57f, -2.0f));
+        model = glm::scale(model, glm::vec3(1.2f, 0.12f, 5.0f));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         // Cobija rosa
         glBindTexture(GL_TEXTURE_2D, texRosa);
         model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 0.55f, -2.0f));
-        model = glm::scale(model, glm::vec3(1.4f, 0.12f, 5.0f));
+        model = glm::translate(model, glm::vec3(0.0f, 0.57f, -2.0f));
+        model = glm::scale(model, glm::vec3(1.2f, 0.12f, 5.0f));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         // Cobija azul
         glBindTexture(GL_TEXTURE_2D, texAzul);
         model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(1.2f, 0.55f, -2.0f));
-        model = glm::scale(model, glm::vec3(1.4f, 0.12f, 5.0f));
+        model = glm::translate(model, glm::vec3(1.2f, 0.57f, -2.0f));
+        model = glm::scale(model, glm::vec3(1.2f, 0.12f, 5.0f));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         glDrawArrays(GL_TRIANGLES, 0, 36);
+
+
 
         //******
         //Buros*
@@ -1003,6 +1055,12 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
         if (!AnimSilla)
             AnimSilla = true;
     }
+    if (keys[GLFW_KEY_P]) {
+        AnimTele = !AnimTele;
+    }
+    if (keys[GLFW_KEY_L]) {
+        LuzLampara = !LuzLampara;
+    }
 }
 
 void Animation() {
@@ -1018,8 +1076,8 @@ void Animation() {
     }
     if (AnimLibro) {
         if (libroY > 0.0f) {
-            libroY -= 0.05f;
-            libroRot += 1.5f;
+            libroY -= 0.01f;
+            libroRot += 1.0f;
         }
         else {
             libroY = 0.0f;
@@ -1030,7 +1088,7 @@ void Animation() {
     if (AnimSilla) {
         if (!SillaJalada) {
             if (sillaZ < 1.5f)
-                sillaZ += 0.03f;
+                sillaZ += 0.01f;
             else {
                 SillaJalada = true;
                 AnimSilla = false;
@@ -1038,12 +1096,30 @@ void Animation() {
         }
         else {
             if (sillaZ > 0.0f)
-                sillaZ -= 0.03f;
+                sillaZ -= 0.01f;
             else {
                 SillaJalada = false;
                 AnimSilla = false;
             }
         }
+    }
+
+    if (AnimTele) {
+        
+        teleX += dirTele;
+        if (teleX > 0.03f || teleX < -0.03f)  
+            dirTele = -dirTele;
+
+       
+        teleRot += dirRot;
+        if (teleRot > 5.0f || teleRot < -5.0f)  
+            dirRot = -dirRot;
+    }
+    else {
+        teleX = 0.0f;
+        teleRot = 0.0f;
+        dirTele = 0.05f;
+        dirRot = 1.5f;
     }
 
 }
