@@ -55,7 +55,19 @@ float sillaZ = 0.0f;
 bool AnimSilla = false;
 bool SillaJalada = false;
 
-//AGREGADO 09/05
+glm::vec3 posChica = glm::vec3(5.0f, .85f, 5.0f);
+float rotPiernaIzq = 0.0f;
+float rotPiernaDer = 0.0f;
+float rotBrazoIzq = 0.0f;
+float rotBrazoDer = 0.0f;
+float dirCaminata = 1.0f;
+bool AnimCaminar = false;
+float rotChica = 0.0f;
+
+bool AnimVolar = false;
+
+int faseChica = 0;
+
 bool AnimTele = false;
 float teleX = 0.0f;
 float dirTele = 0.05f;
@@ -63,6 +75,7 @@ float teleRot = 0.0f;
 float dirRot = 1.5f;
 
 bool LuzLampara = false;
+
 
 // Positions of the point lights
 glm::vec3 pointLightPositions[] = {
@@ -123,7 +136,7 @@ glm::vec3 Light1 = glm::vec3(0);
 GLfloat deltaTime = 0.0f;	// Time between current frame and last frame
 GLfloat lastFrame = 0.0f;  	// Time of last frame
 
-// Id s de las texturas que utilizaremos, las cuales estan almacenadas en una carpeta de nuestro proyecto
+// Id's de las texturas que utilizaremos, las cuales estan almacenadas en una carpeta de nuestro proyecto
 GLuint texMorado, texGris, texVerde, texRosa, texAzul,
 texFucsia, texCrema, texNegro, texAzulLibro, texMoradoLibro,
 texMoradoMesa, texRosaSilla, texRosaTapete;
@@ -192,6 +205,15 @@ int main()
     Model TeleCable((char*)"Models/cable.obj");
     Model TeleCabeza((char*)"Models/cabecita.obj");
     Model Lampara((char*)"Models/lampp.obj");
+    Model Mueble((char*)"Models/_mueble_ropa.obj");
+    Model Vanity((char*)"Models/vanity.obj");
+
+    Model Vestido((char*)"Models/vestido.obj");
+    Model ManoIzq((char*)"Models/manoizq.obj");
+    Model ManoDer((char*)"Models/manoder.obj");
+    Model PiernaIzq((char*)"Models/piernaizq.obj");
+    Model PiernaDer((char*)"Models/piernader.obj");
+    Model Cabeza((char*)"Models/cabeza.obj");
 
     // First, set the container's VAO (and VBO)
     GLuint VBO, VAO;
@@ -207,13 +229,13 @@ int main()
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    // Configuraci n de coordenadas de textura (UV) que agregamos
+    // Configuracion de coordenadas de textura (UV) que agregamos
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
     glBindVertexArray(0);
 
-    // Aqu  cargamos nuestras texturas que estan en nuestra carpeta "texturas", las cuales con colores solidos
+    // Aqui  cargamos nuestras texturas que estan en nuestra carpeta "texturas", las cuales con colores solidos
     texMorado = cargarTextura("textures/morado.png");       // Base cama, respaldo, repisa, baul fuera, buros
     texGris = cargarTextura("textures/gris.png");         // Cajones de buros
     texVerde = cargarTextura("textures/verde.png");        // Cobija bellota
@@ -362,7 +384,7 @@ int main()
 
         //Carga de modelo
         model = glm::mat4(1);
-        model = glm::translate(model, glm::vec3(0.0f, 0.380f, 1.24f));///AQUIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+        model = glm::translate(model, glm::vec3(0.0f, 0.380f, 1.24f));///AQUIIIIIIIIIIIIIIIIIIIIIIIII
         model = glm::scale(model, glm::vec3(2.5f, 1.0f, 2.5f));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         glUniform1i(glGetUniformLocation(lightingShader.Program, "material.diffuse"), 0);
@@ -371,7 +393,7 @@ int main()
 
 
         // Carga el modelo de las paredes
-        //pared1 YA ESTAAAAAAA LISTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        //pared1 YA ESTAAAAAAA LISTAAAAAAAAAAAAAAAAAAAAAAAAA
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(-7.20f, 3.12f, 1.24f));
         model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -424,23 +446,22 @@ int main()
         glActiveTexture(GL_TEXTURE0);
         Crayolas.Draw(lightingShader);
 
-        //AGREGADO  09/05
         //TELEFONO
-        // BASE - estatica
+        // BASE
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(2.8f, 1.02f, -4.0f));
         model = glm::scale(model, glm::vec3(2.5f, 2.5f, 2.5f));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         TeleBase.Draw(lightingShader);
 
-        // CABLE - vibra en X
+        // CABLE 
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(2.75f + teleX, 1.02f, -4.0f));
         model = glm::scale(model, glm::vec3(2.5f, 2.5f, 2.5f));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         TeleCable.Draw(lightingShader);
 
-        // CABEZA - vibra en X y rota
+        // CABEZA 
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(2.8f + teleX, 1.02f, -4.0f));
         model = glm::rotate(model, glm::radians(teleRot), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -454,6 +475,64 @@ int main()
         model = glm::scale(model, glm::vec3(1.3f, 1.3f, 1.3f));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         Lampara.Draw(lightingShader);
+
+        //VANITY
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, -0.08f, 7.0f)); 
+        model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(2.5f, 2.5f, 2.5f));
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        Vanity.Draw(lightingShader);
+
+        //****
+        //Mueble ropa*
+        //****
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(5.5f, 0.0f, 6.9f));
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        Mueble.Draw(lightingShader);
+
+
+        //BUBBLES
+        // Cuerpo base
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, posChica);
+        model = glm::rotate(model, glm::radians(rotChica), glm::vec3(0.0f, 1.0f, 0.0f));
+
+        glm::mat4 modelTemp = model;
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        Vestido.Draw(lightingShader);
+
+        // Cabeza
+        model = modelTemp;
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        Cabeza.Draw(lightingShader);
+
+        // Pierna izquierda
+        model = modelTemp;
+        model = glm::rotate(model, glm::radians(rotPiernaIzq), glm::vec3(1.0f, 0.0f, 0.0f));
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        PiernaIzq.Draw(lightingShader);
+
+        // Pierna derecha
+        model = modelTemp;
+        model = glm::rotate(model, glm::radians(rotPiernaDer), glm::vec3(1.0f, 0.0f, 0.0f));
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        PiernaDer.Draw(lightingShader);
+
+        // Mano izquierda
+        model = modelTemp;
+        model = glm::rotate(model, glm::radians(rotBrazoIzq), glm::vec3(0.0f, 0.0f, 1.0f));
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        ManoIzq.Draw(lightingShader);
+
+        // Mano derecha
+        model = modelTemp;
+        model = glm::rotate(model, glm::radians(rotBrazoDer), glm::vec3(0.0f, 0.0f, 1.0f));
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        ManoDer.Draw(lightingShader);
 
         // Activar unidad de textura 0 para todos los cubos
         glActiveTexture(GL_TEXTURE0);
@@ -492,14 +571,14 @@ int main()
         }
 
         //*********************
-        //Coraz n del respaldo* 
+        //Corazon del respaldo* 
         //*********************
 
         glBindTexture(GL_TEXTURE_2D, texRosaTapete);
 
         glm::vec3 centroCorazonCabecera = glm::vec3(0.0f, 1.45f, -4.35f);
 
-        // Pico del coraz n
+        // Pico del corazon
         model = glm::mat4(1.0f);
         model = glm::translate(model, centroCorazonCabecera);
         model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
@@ -507,7 +586,7 @@ int main()
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
-        // Orejitas del coraz n
+        // Orejitas del corazon
         for (int j = 0; j < 10; j++) {
             float rot = j * 18.0f;
 
@@ -528,7 +607,6 @@ int main()
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
 
-        //CAMBIOS 09/05
         //**********
         //Almohadas*
         //**********
@@ -598,8 +676,6 @@ int main()
         //******
         //Buros*
         //******
-
-
         float posicionesX[] = { -2.8f, 2.8f };
 
         for (int i = 0; i < 2; i++) {
@@ -677,15 +753,6 @@ int main()
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
-        /*  Libro 1: Azul claro (inclinado izquierda)
-         glBindTexture(GL_TEXTURE_2D, texAzulLibro);
-         model = glm::mat4(1.0f);
-         model = glm::translate(model, glm::vec3(-4.1f, 3.75f, -4.75f));
-         model = glm::rotate(model, glm::radians(15.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-         model = glm::scale(model, glm::vec3(0.18f, 0.6f, 0.35f));
-         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-         glDrawArrays(GL_TRIANGLES, 0, 36);*/
-
          // Libro 1: Azul claro (es el que se cae)
         glBindTexture(GL_TEXTURE_2D, texAzulLibro);
         model = glm::mat4(1.0f);
@@ -721,7 +788,7 @@ int main()
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         //*****
-        //Ba l*
+        //Baul*
         //*****
 
         // Caja
@@ -836,8 +903,10 @@ int main()
             }
         }
 
+
+
         //***************
-        //Tapete coraz n*
+        //Tapete corazon*
         //***************
 
         glBindTexture(GL_TEXTURE_2D, texRosaTapete);
@@ -918,7 +987,7 @@ int main()
 
 
 //***************************************************
-//Funci n para cargar textura con ayuda de stb_image*
+//Funcion para cargar textura con ayuda de stb_image*
 //***************************************************
 
 GLuint cargarTextura(const char* path)
@@ -1007,7 +1076,6 @@ void DoMovement()
     {
         pointLightPositions[0].z += 0.01f;
     }
-
 }
 
 // Is called whenever a key is pressed/released via GLFW
@@ -1054,6 +1122,13 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
     if (key == GLFW_KEY_B && action == GLFW_PRESS) {
         if (!AnimSilla)
             AnimSilla = true;
+    }
+    if (key == GLFW_KEY_C && action == GLFW_PRESS) {
+        AnimCaminar = !AnimCaminar;
+        if (AnimCaminar) {
+            faseChica = 0;
+            rotChica = 0.0f;
+        }
     }
     if (keys[GLFW_KEY_P]) {
         AnimTele = !AnimTele;
@@ -1104,6 +1179,19 @@ void Animation() {
         }
     }
 
+    if (AnimCaminar) {
+        posChica.z -= 0.01f;
+        rotPiernaIzq += 0.8f * dirCaminata;
+        rotPiernaDer -= 0.8f * dirCaminata;
+        rotBrazoIzq -= 0.5f * dirCaminata;
+        rotBrazoDer += 0.5f * dirCaminata;
+        if (rotPiernaIzq > 30.0f || rotPiernaIzq < -30.0f)
+            dirCaminata *= -1.0f;
+        if (posChica.z <= -1.1f) {
+            AnimCaminar = false;
+            rotPiernaIzq = rotPiernaDer = rotBrazoIzq = rotBrazoDer = 0.0f;
+        }
+    }
     if (AnimTele) {
         
         teleX += dirTele;
