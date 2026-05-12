@@ -1,1 +1,13 @@
 Models/*.obj
+Debug/
+.vs/
+
+*.log
+*.user
+*.suo
+
+
+*.pdb
+*.ipdb
+*.iobj
+*.tlog
